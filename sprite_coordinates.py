@@ -1,11 +1,9 @@
-from pico2d import *
+# 스프라이트 시트 프레임 좌표 정보
+# animation_sheet.png (8x4 그리드)
 
-
-TUK_WIDTH, TUK_HEIGHT = 1280, 1024
-open_canvas(TUK_WIDTH, TUK_HEIGHT)
-
-tuk_ground = load_image('TUK_GROUND.png')
-character = load_image('animation_sheet.png')
+# 프레임 크기 (실제 이미지에 따라 조정)
+FRAME_WIDTH = 100
+FRAME_HEIGHT = 100
 
 # 각 애니메이션별 프레임 좌표 (x, y, width, height)
 SPRITE_ANIMATIONS = {
@@ -51,58 +49,13 @@ SPRITE_ANIMATIONS = {
     ]
 }
 
-def handle_events():
-    global running, x_dir, y_dir
+# 사용 예시
+def get_frame_rect(animation_name, frame_index):
+    """특정 애니메이션의 프레임 좌표를 반환"""
+    if animation_name in SPRITE_ANIMATIONS:
+        if 0 <= frame_index < len(SPRITE_ANIMATIONS[animation_name]):
+            return SPRITE_ANIMATIONS[animation_name][frame_index]
+    return None
 
-    global x, y
-
-    events = get_events()
-    for event in events:
-        if event.type == SDL_QUIT:
-            running = False
-        elif event.type == SDL_KEYDOWN:
-            if event.key == SDLK_RIGHT:
-                x_dir += 1
-            elif event.key == SDLK_LEFT:
-                x_dir -= 1
-            elif event.key == SDLK_UP:
-                y_dir += 1
-            elif event.key == SDLK_DOWN:
-                y_dir -= 1
-            elif event.key == SDLK_ESCAPE:
-                running = False
-        elif event.type == SDL_KEYUP:
-            if event.key == SDLK_RIGHT:
-                x_dir -= 1
-            elif event.key == SDLK_LEFT:
-                x_dir += 1
-            elif event.key == SDLK_UP:
-                y_dir -= 1
-            elif event.key == SDLK_DOWN:
-                y_dir += 1
-
-
-running = True
-x = 800 // 2
-y = 800 // 2
-frame = 0
-x_dir = 0
-y_dir = 0
-
-while running:
-    clear_canvas()
-    tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
-
-    # run_right 애니메이션 사용
-    sprite_x, sprite_y, sprite_width, sprite_height = SPRITE_ANIMATIONS['run_right'][frame]
-    character.clip_draw(sprite_x, sprite_y, sprite_width, sprite_height, x, y)
-
-    update_canvas()
-    handle_events()
-    frame = (frame + 1) % 8
-    x += x_dir * 5
-    y += y_dir * 5
-    delay(0.05)
-
-
-close_canvas()
+# 예시: walk_down 애니메이션의 첫 번째 프레임
+# x, y, width, height = SPRITE_ANIMATIONS['walk_down'][0]  # (0, 0, 32, 32)
