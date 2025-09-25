@@ -82,18 +82,24 @@ def handle_events():
                 y_dir += 1
 
 
-def get_current_animation(x_dir):
+def get_current_animation(x_dir, last_direction):
     """현재 이동 방향에 따라 적절한 애니메이션을 반환"""
     if x_dir > 0:  # 오른쪽으로 이동
         return 'run_right'
     elif x_dir < 0:  # 왼쪽으로 이동
         return 'run_left'
     else:  # 정지 상태
-        return 'run_right'  # 기본값
+        # 이전 방향에 따라 적절한 walk 애니메이션 선택
+        if last_direction > 0:  # 이전에 오른쪽으로 이동
+            return 'walk_left'
+        elif last_direction < 0:  # 이전에 왼쪽으로 이동
+            return 'walk_right'
+        else:  # 초기 상태
+            return 'walk_right'  # 기본값
 
-def update_character(x, y, frame, x_dir):
+def update_character(x, y, frame, x_dir, last_direction):
     """캐릭터를 현재 상태에 맞게 화면에 그리기"""
-    animation = get_current_animation(x_dir)
+    animation = get_current_animation(x_dir, last_direction)
     sprite_x, sprite_y, sprite_width, sprite_height = SPRITE_ANIMATIONS[animation][frame]
     character.clip_draw(sprite_x, sprite_y, sprite_width, sprite_height, x, y)
 
@@ -105,20 +111,25 @@ y = 800 // 2
 frame = 0
 x_dir = 0
 y_dir = 0
+last_x_dir = 0  # 이전 x 방향을 추적하는 변수
 
 while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
 
     # 캐릭터 업데이트 및 그리기
-    update_character(x, y, frame, x_dir)
+    update_character(x, y, frame, x_dir, last_x_dir)
 
     update_canvas()
     handle_events()
     frame = (frame + 1) % 8
     x += x_dir * 5
     y += y_dir * 5
+
+    # 이전 방향 업데이트 (현재 이동 중일 때만)
+    if x_dir != 0:
+        last_x_dir = x_dir
+
     delay(0.05)
 
 close_canvas()
-
