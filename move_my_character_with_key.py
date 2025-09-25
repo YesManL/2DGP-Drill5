@@ -82,6 +82,23 @@ def handle_events():
                 y_dir += 1
 
 
+def get_current_animation(x_dir):
+    """현재 이동 방향에 따라 적절한 애니메이션을 반환"""
+    if x_dir > 0:  # 오른쪽으로 이동
+        return 'run_right'
+    elif x_dir < 0:  # 왼쪽으로 이동
+        return 'run_left'
+    else:  # 정지 상태
+        return 'run_right'  # 기본값
+
+def update_character(x, y, frame, x_dir):
+    """캐릭터를 현재 상태에 맞게 화면에 그리기"""
+    animation = get_current_animation(x_dir)
+    sprite_x, sprite_y, sprite_width, sprite_height = SPRITE_ANIMATIONS[animation][frame]
+    character.clip_draw(sprite_x, sprite_y, sprite_width, sprite_height, x, y)
+
+global running, x_dir, y_dir
+
 running = True
 x = 800 // 2
 y = 800 // 2
@@ -93,9 +110,8 @@ while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
 
-    # run_right 애니메이션 사용
-    sprite_x, sprite_y, sprite_width, sprite_height = SPRITE_ANIMATIONS['run_right'][frame]
-    character.clip_draw(sprite_x, sprite_y, sprite_width, sprite_height, x, y)
+    # 캐릭터 업데이트 및 그리기
+    update_character(x, y, frame, x_dir)
 
     update_canvas()
     handle_events()
@@ -104,5 +120,5 @@ while running:
     y += y_dir * 5
     delay(0.05)
 
-
 close_canvas()
+
